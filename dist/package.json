@@ -1,0 +1,30 @@
+{
+  "name": "jfetch",
+  "version": "0.0.1",
+  "description": "Utility for json only comms via fetch",
+  "main": "index.js",
+  "scripts": {
+    "build-dist": "webpack --config webpack.config.js index.js dist/index.js && cp package.json dist/package.json ",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "fetch",
+    "ajax"
+  ],
+  "author": "Warren Mira <warrenmira@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "assign": "^0.1.7"
+  },
+  "devDependencies": {
+    "babel-core": "^6.4.5",
+    "babel-loader": "^6.2.1",
+    "babel-preset-es2015": "^6.3.13",
+    "webpack": "^1.12.12"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  }
+}
