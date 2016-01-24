@@ -17,11 +17,11 @@ npm install --save jfetch
 import jfetch from 'jfetch';
 
 jfetch.get('/somewhere').then ( res => {
-    console.log('res here is json' , res);
+    console.log('res here is json object' , res);
 });
 
 jfetch.post('/post/path', {id:1, name: 'Name', data: []}).then ( res => {
-    console.log('res here is result of the post' , res);
+    console.log('res here is result of the post - translated to json' , res);
 });
 
 ```
