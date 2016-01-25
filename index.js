@@ -19,7 +19,8 @@ const DEFAULT_JSON_POST = Object.freeze({
     headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json'
-    }
+    },
+    credentials: 'same-origin'
 });
 
 
@@ -35,7 +36,7 @@ export const bust = (path) => {
 
 const toJson = ( res ) => res.json();
 
-const baseJFetch = (config, path, params) => {
+const baseJFetch = function(config, path, params) {
     const theFetch = getFetch();
     return theFetch( config.autoBust ? bust(path) : path,
         assign({}, params || {} , config.sameOrigin ? AUTO_SAME_ORIGIN : {} )).then( toJson );
@@ -44,19 +45,26 @@ const baseJFetch = (config, path, params) => {
 const baseJFetchPost = (config, path, toPost) => {
     return baseJFetch(config, path, assign({}, DEFAULT_JSON_POST,{
         body: JSON.stringify(toPost||{})
-    })).then( toJson );
+    }));
 };
 
 /**
  * Create base object
  */
-const jfetch = baseJFetch.bind(null, DEFAULT_CONFIG);
-jfetch.prototype = {};
-jfetch.prototype.post = baseJFetchPost.bind(null, DEFAULT_CONFIG );
+const jfetch = function() {
+    const args = [DEFAULT_CONFIG, ...Array.from(arguments)];
+    return baseJFetch(...args);
+};
+
+jfetch.post = function() {
+    const args = [DEFAULT_JSON_POST, ...Array.from(arguments)];
+    return baseJFetchPost(...args);
+};
 
 export const createjFetch = (config) => {
     const configBase = assign({}, config, DEFAULT_CONFIG );
     return baseJFetch.bind(null, configBase);
 };
 
+export {jfetch};
 export default jfetch;

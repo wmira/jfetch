@@ -59,13 +59,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.createjFetch = exports.bust = undefined;
+	exports.jfetch = exports.createjFetch = exports.bust = undefined;
 
 	var _objectAssign = __webpack_require__(1);
 
 	var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	/** this assumes that fetch is available in globals or window */
 	var getFetch = function getFetch() {
@@ -86,7 +88,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    headers: {
 	        'Accept': 'application/json',
 	        'Content-Type': 'application/json'
-	    }
+	    },
+	    credentials: 'same-origin'
 	});
 
 	var bust = exports.bust = function bust(path) {
@@ -111,21 +114,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	var baseJFetchPost = function baseJFetchPost(config, path, toPost) {
 	    return baseJFetch(config, path, (0, _objectAssign2.default)({}, DEFAULT_JSON_POST, {
 	        body: JSON.stringify(toPost || {})
-	    })).then(toJson);
+	    }));
 	};
 
 	/**
 	 * Create base object
 	 */
-	var jfetch = baseJFetch.bind(null, DEFAULT_CONFIG);
-	jfetch.prototype = {};
-	jfetch.prototype.post = baseJFetchPost.bind(null, DEFAULT_CONFIG);
+	var jfetch = function jfetch() {
+	    var args = [DEFAULT_CONFIG].concat(_toConsumableArray(Array.from(arguments)));
+	    return baseJFetch.apply(undefined, _toConsumableArray(args));
+	};
+
+	jfetch.post = function () {
+	    var args = [DEFAULT_JSON_POST].concat(_toConsumableArray(Array.from(arguments)));
+	    return baseJFetchPost.apply(undefined, _toConsumableArray(args));
+	};
 
 	var createjFetch = exports.createjFetch = function createjFetch(config) {
 	    var configBase = (0, _objectAssign2.default)({}, config, DEFAULT_CONFIG);
 	    return baseJFetch.bind(null, configBase);
 	};
 
+	exports.jfetch = jfetch;
 	exports.default = jfetch;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
