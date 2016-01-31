@@ -51,6 +51,12 @@ const baseJFetchPost = (config, path, toPost) => {
     }));
 };
 
+const baseJFetchPut = (config, path, toPost) => {
+    return baseJFetch(config, path, assign({}, DEFAULT_JSON_PUT,{
+        body: JSON.stringify(toPost||{})
+    }));
+};
+
 /**
  * Create base object
  */
@@ -66,7 +72,7 @@ jfetch.post = function() {
 
 jfetch.put = function() {
     const args = [DEFAULT_JSON_PUT, ...Array.from(arguments)];
-    return baseJFetchPost(...args);
+    return baseJFetchPut(...args);
 };
 
 export const createjFetch = (config) => {

@@ -118,6 +118,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }));
 	};
 
+	var baseJFetchPut = function baseJFetchPut(config, path, toPost) {
+	    return baseJFetch(config, path, (0, _objectAssign2.default)({}, DEFAULT_JSON_PUT, {
+	        body: JSON.stringify(toPost || {})
+	    }));
+	};
+
 	/**
 	 * Create base object
 	 */
@@ -133,7 +139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	jfetch.put = function () {
 	    var args = [DEFAULT_JSON_PUT].concat(_toConsumableArray(Array.from(arguments)));
-	    return baseJFetchPost.apply(undefined, _toConsumableArray(args));
+	    return baseJFetchPut.apply(undefined, _toConsumableArray(args));
 	};
 
 	var createjFetch = exports.createjFetch = function createjFetch(config) {

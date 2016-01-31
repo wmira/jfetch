@@ -1,6 +1,6 @@
 {
   "name": "jfetch",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Utility for json only comms via fetch",
   "main": "index.js",
   "scripts": {
