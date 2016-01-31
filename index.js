@@ -22,7 +22,10 @@ const DEFAULT_JSON_POST = Object.freeze({
     },
     credentials: 'same-origin'
 });
-
+const DEFAULT_JSON_PUT = Object.freeze(assign({},
+    DEFAULT_JSON_POST,
+    { method: 'put'})
+);
 
 export const bust = (path) => {
     let resultingPath = path;
@@ -58,6 +61,11 @@ const jfetch = function() {
 
 jfetch.post = function() {
     const args = [DEFAULT_JSON_POST, ...Array.from(arguments)];
+    return baseJFetchPost(...args);
+};
+
+jfetch.put = function() {
+    const args = [DEFAULT_JSON_PUT, ...Array.from(arguments)];
     return baseJFetchPost(...args);
 };
 

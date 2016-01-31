@@ -91,6 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    credentials: 'same-origin'
 	});
+	var DEFAULT_JSON_PUT = Object.freeze((0, _objectAssign2.default)({}, DEFAULT_JSON_POST, { method: 'put' }));
 
 	var bust = exports.bust = function bust(path) {
 	    var resultingPath = path;
@@ -127,6 +128,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	jfetch.post = function () {
 	    var args = [DEFAULT_JSON_POST].concat(_toConsumableArray(Array.from(arguments)));
+	    return baseJFetchPost.apply(undefined, _toConsumableArray(args));
+	};
+
+	jfetch.put = function () {
+	    var args = [DEFAULT_JSON_PUT].concat(_toConsumableArray(Array.from(arguments)));
 	    return baseJFetchPost.apply(undefined, _toConsumableArray(args));
 	};
 

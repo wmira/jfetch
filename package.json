@@ -1,10 +1,10 @@
 {
   "name": "jfetch",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Utility for json only comms via fetch",
   "main": "index.js",
   "scripts": {
-    "build-dist": "webpack --config webpack.config.js index.js dist/index.js && cp package.json dist/package.json ",
+    "build-dist": "webpack --config webpack.config.js index.js dist/index.js && cp README.md dist/README.md && cp package.json dist/package.json ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

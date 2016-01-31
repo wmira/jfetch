@@ -16,7 +16,7 @@ npm install --save jfetch
 
 import jfetch from 'jfetch';
 
-jfetch.get('/somewhere').then ( res => {
+jfetch('/somewhere').then ( res => {
     console.log('res here is json object' , res);
 });
 
@@ -32,5 +32,5 @@ By default jfetch auto busts get requests. If needed you can build that will hav
 import { createjFetch } from 'jfetch';
 
 const jfetch = createJFetch({autoBust: false});
-jfetch.get('/somewhere'); # no url busts
+jfetch('/somewhere'); # no url busts
 ```
