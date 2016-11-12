@@ -1,7 +1,23 @@
-import assign from 'object-assign';
+
+const { assign, freeze } = Object;
+
+const identity = a => a;
+const get = (field, withDefault ) => (obj) => {
+    return obj[field] || withDefault;
+};
+
+const DEFAULT_CONFIG = freeze({ method: 'get', autoBust: true, credentials: 'same-origin', withConfig: identity });
+
+const DEFAULT_JSON_POST = freeze({
+    method: 'post',
+    headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+});
 
 /** this assumes that fetch is available in globals or window */
-const getFetch = () => {
+export const getFetch = () => {
     let theFetch;
     if (typeof global !== 'undefined') {
         theFetch = global.fetch;
@@ -9,23 +25,13 @@ const getFetch = () => {
     if ( !theFetch && typeof window !== 'undefined') {
         theFetch = window.fetch;
     }
+    if ( !theFetch ) {
+        throw new Error('Unable to find fetch');
+    }
     return theFetch;
 };
 
-const DEFAULT_CONFIG = Object.freeze({ autoBust: true, sameOrigin: true });
-const AUTO_SAME_ORIGIN = Object.freeze({ credentials: 'same-origin' });
-const DEFAULT_JSON_POST = Object.freeze({
-    method: 'post',
-    headers:{
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    credentials: 'same-origin'
-});
-const DEFAULT_JSON_PUT = Object.freeze(assign({},
-    DEFAULT_JSON_POST,
-    { method: 'put'})
-);
+
 
 export const bust = (path) => {
     let resultingPath = path;
@@ -37,48 +43,90 @@ export const bust = (path) => {
     return resultingPath += '__bust__=' + (new Date()).getTime();
 };
 
-const toJson = ( res ) => res.json();
+const withOnResponse = (onResponse) => next => (response) => {
 
-const baseJFetch = function(config, path, params) {
-    const theFetch = getFetch();
-    return theFetch( config.autoBust ? bust(path) : path,
-        assign({}, params || {} , config.sameOrigin ? AUTO_SAME_ORIGIN : {} )).then( toJson );
+    if ( onResponse ) {
+        try {
+            onResponse(response);
+        } catch ( ex ) {
+            console.warn('Error on calling onResponse handler ', ex);
+        }
+    }
+    return next(response);
 };
+
+const toJson = config => withOnResponse(config.onResponse)( response => response.json());
+
+
+
+const baseFetcher = (config, path, params = {} ) => {
+
+    const theFetch = getFetch();
+    const toJsonHandler = toJson(config);
+    
+    const { withConfig = identity, ...otherConfig } = config;
+    const withUserConfig = withConfig() || {};
+
+    const { headers: paramHeaders, ...otherParams } = params;
+
+    const headers = { ...withUserConfig.headers, ...paramHeaders };
+    const credentials = get('credentials', config.credentials )(withUserConfig);    
+
+    const configToUse = {...otherConfig, ...withConfig, ...otherParams, headers, credentials };
+
+    return theFetch( config.autoBust && config.method === 'get' ? bust(path) : path,
+        configToUse).then( toJsonHandler );
+
+};
+
 
 const baseJFetchPost = (config, path, toPost) => {
-    return baseJFetch(config, path, assign({}, DEFAULT_JSON_POST,{
-        body: JSON.stringify(toPost||{})
-    }));
+    return baseFetcher(config, path, { ...DEFAULT_JSON_POST, body: JSON.stringify(toPost||{}) });    
 };
 
-const baseJFetchPut = (config, path, toPost) => {
-    return baseJFetch(config, path, assign({}, DEFAULT_JSON_PUT,{
-        body: JSON.stringify(toPost||{})
-    }));
+
+
+
+const postHandler = (config) => (...args) => {
+    const postArg = [ { ...config, ...DEFAULT_JSON_POST }, ...args];
+    return baseJFetchPost(...postArg);
+};
+const putHandler = (config) => postHandler({ ...config, method: 'put' });
+
+const headHandler = (config) => (...args) => {
+    const headArgs = [ { ...DEFAULT_CONFIG, ...config, method: 'head', autoBust: 'false' }, ...args ];
+    return baseFetcher(...headArgs);
+};
+
+const HTTP_ACTIONS = {
+    head: headHandler,
+    post: postHandler,
+    put: putHandler 
+};
+
+const addActions = (fetchToEnchance, config) => {
+    return Object.keys(HTTP_ACTIONS)
+        .reduce( (theFetch, action) => {
+            theFetch[action] = HTTP_ACTIONS[action](config);
+            return theFetch;
+        }, fetchToEnchance);
+};
+
+export const createJfetch = (config) => {
+    const configBase = { ...DEFAULT_CONFIG, ...config };
+    
+    const newJfetch = (...args) => {
+        return baseFetcher(configBase, ...args);
+    };
+    return addActions(newJfetch, configBase);
+
 };
 
 /**
- * Create base object
+ * Create default jfetch
  */
-const jfetch = function() {
-    const args = [DEFAULT_CONFIG, ...Array.from(arguments)];
-    return baseJFetch(...args);
-};
+const jfetch = createJfetch(DEFAULT_CONFIG);
 
-jfetch.post = function() {
-    const args = [DEFAULT_JSON_POST, ...Array.from(arguments)];
-    return baseJFetchPost(...args);
-};
 
-jfetch.put = function() {
-    const args = [DEFAULT_JSON_PUT, ...Array.from(arguments)];
-    return baseJFetchPut(...args);
-};
-
-export const createjFetch = (config) => {
-    const configBase = assign({}, config, DEFAULT_CONFIG );
-    return baseJFetch.bind(null, configBase);
-};
-
-export {jfetch};
+export { jfetch };
 export default jfetch;
