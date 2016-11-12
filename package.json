@@ -1,6 +1,6 @@
 {
   "name": "jfetch",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Utility for json only comms via fetch",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,11 @@
     "react native ajax",
     "ajax"
   ],
+  "homepage": "https://github.com/wmira/jfetch.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wmira/jfetch.git"
+  },
   "author": "Warren Mira <warrenmira@gmail.com>",
   "license": "MIT",
   "devDependencies": {

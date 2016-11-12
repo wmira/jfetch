@@ -57,41 +57,8 @@ jfetch('/api/inventories').then(...); //...will not auto bust get
 
 ```
 
+### Settings for custom jfetch
 
-## withConfig
-
-You can use with config to pass extra configurati
-
-## Response Combinator
-
-Sometimes you would want to have a combinator to check a json response for application
-level response code. You can use 
-
-
-
-
-
-
-
-
-
-
-
-jfetch('/somewhere').then ( res => {
-    console.log('res here is json object' , res);
-});
-
-jfetch.post('/post/path', {id:1, name: 'Name', data: []}).then ( res => {
-    console.log('res here is result of the post - translated to json' , res);
-});
-
-
-
-By default jfetch auto busts get requests. If needed you can build that will have a different config.
-
-
-import { createjFetch } from 'jfetch';
-
-const jfetch = createJFetch({autoBust: false});
-jfetch('/somewhere'); # no url busts
+1. withConfig - function that returns an extra configuration to be merged with the requests
+2. onRespose - function that can receive response data 
 

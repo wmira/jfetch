@@ -61,3 +61,4 @@ jfetch('/api/inventories').then(...); //...will not auto bust get
 
 1. withConfig - function that returns an extra configuration to be merged with the requests
 2. onRespose - function that can receive response data 
+
